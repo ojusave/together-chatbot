@@ -2,6 +2,8 @@
 
 This is a template for an AI chatbot using Next.js + the Vercel AI SDK + Together AI in ~250 LOC.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ojusave/together-chatbot)
+
 ## Tech stack
 
 - Together.ai for the LLM

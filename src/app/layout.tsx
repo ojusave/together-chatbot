@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import TogetherLogo from "./TogetherLogo";
+import DeployToRenderButton from "@/components/DeployToRenderButton";
+import { GITHUB_REPO_URL, renderSignupUrlWithUtms } from "@/lib/render";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,9 +42,20 @@ export default function RootLayout({
               Together AI Solutions
             </a>
 
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-4">
+              <DeployToRenderButton />
               <a
-                href="https://github.com/nutlope/together-chatbot"
+                href={renderSignupUrlWithUtms("navbar_button")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-gray-900"
+              >
+                Sign up on Render
+              </a>
+              <a
+                href={GITHUB_REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-500 hover:text-gray-900"
               >
                 <GitHubLogoIcon width="20" height="20" />
