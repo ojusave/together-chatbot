@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: together-chatbot
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: TOGETHER_API_KEY
+        sync: false
