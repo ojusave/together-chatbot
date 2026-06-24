@@ -51,36 +51,70 @@ export default function Chat() {
       },
     ]);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({
-        messages: [
-          ...messages,
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-      }),
-    });
-
-    if (!res.body) return;
-
-    ChatCompletionStream.fromReadableStream(res.body)
-      .on("content", (delta, content) => {
-        setMessages((messages) => {
-          const lastMessage = messages.at(-1);
-
-          if (lastMessage?.role !== "assistant") {
-            return [...messages, { role: "assistant", content }];
-          } else {
-            return [...messages.slice(0, -1), { ...lastMessage, content }];
-          }
-        });
-      })
-      .on("end", () => {
-        setIsPending(false);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            ...messages,
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+        }),
       });
+
+      if (!res.ok) {
+        let errorMessage = "Something went wrong. Please try again.";
+        try {
+          const data = await res.json();
+          if (typeof data.error === "string") {
+            errorMessage = data.error;
+          }
+        } catch {
+          // use default message
+        }
+
+        setMessages((messages) => [
+          ...messages,
+          { role: "assistant", content: errorMessage },
+        ]);
+        setIsPending(false);
+        return;
+      }
+
+      if (!res.body) {
+        setIsPending(false);
+        return;
+      }
+
+      ChatCompletionStream.fromReadableStream(res.body)
+        .on("content", (delta, content) => {
+          setMessages((messages) => {
+            const lastMessage = messages.at(-1);
+
+            if (lastMessage?.role !== "assistant") {
+              return [...messages, { role: "assistant", content }];
+            } else {
+              return [...messages.slice(0, -1), { ...lastMessage, content }];
+            }
+          });
+        })
+        .on("end", () => {
+          setIsPending(false);
+        });
+    } catch {
+      setMessages((messages) => [
+        ...messages,
+        {
+          role: "assistant",
+          content: "Network error. Please check your connection and try again.",
+        },
+      ]);
+      setIsPending(false);
+    }
   }
 
   return (
